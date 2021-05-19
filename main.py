@@ -5,7 +5,6 @@ import time
 import random
 
 lines = []
-
 def translate_point(p):
     return Point(p.x + origin_x, origin_y - p.y)
 
@@ -21,13 +20,15 @@ def draw_lines(polygon,color=None):
 
 def draw_obj(polygon):
     clear_lines()
-    colors = ['red', 'blue', 'green', 'orange', 'pink', 'yellow']
-    color = colors[random.randint(0,5)]
+    colors = ['red', 'blue', 'green', 'orange', 'pink', 'yellow', "brown", "sea green", "orange red", "SlateBlue2", "PaleTurquoise2", "khaki1", "coral1"]
     for r in range(len(polygon.points) - 1):
         p1 = translate_point(polygon.points[r])
         p2 = translate_point(polygon.points[r + 1])
-        canvas.create_line(p1.x,p1.y, p2.x, p2.y, fill=color)
+        color = colors[random.randint(0,len(colors) - 1)]
+        line = canvas.create_line(p1.x,p1.y, p2.x, p2.y, fill=color)
+        lines.append(line)
     
+    color = colors[random.randint(0,len(colors) - 1)]
     last = translate_point(polygon.points[-1])
     first = translate_point(polygon.points[0])
     line = canvas.create_line(last.x, last.y, first.x, first.y, fill=color)

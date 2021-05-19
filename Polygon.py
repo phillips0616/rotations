@@ -8,11 +8,14 @@ class Polygon:
     
     def add_point(self,p):
         insert_index = 0
+        foundclock = False
         for p2 in self.points:
-            if not self.clockwise(p, p2):
+            clock = self.clockwise(p, p2) 
+            if clock:
+                foundclock = True
+            if not clock and foundclock:
                 break
-            else:
-                insert_index += 1
+            insert_index += 1
         
         self.points.insert(insert_index, p)
         
