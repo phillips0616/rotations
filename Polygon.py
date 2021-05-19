@@ -4,11 +4,31 @@ import math
 class Polygon:
     def __init__(self, points=[]):
         self.points = points
-        self.center_point = self.calc_centroid()
+        self.center_point = None#self.calc_centroid()
     
-    def add_point(self,x,y):
-        p = Point(x,y)
-        self.points.append(p)
+    def add_point(self,p):
+        insert_index = 0
+        for p2 in self.points:
+            if not self.clockwise(p, p2):
+                break
+            else:
+                insert_index += 1
+        
+        self.points.insert(insert_index, p)
+        
+
+        
+    def clockwise(self, p1, p2):
+
+        determinate = p1.x*p2.y - p1.y*p2.x
+
+        if determinate > 0:
+            return True
+        elif determinate < 0:
+            return False
+        else:
+            #this should be a calculation
+            return True
 
     def rotate_points_abt_axis(self, degree):
         radians = math.radians(degree)
@@ -43,4 +63,9 @@ class Polygon:
             sum_x += p.x
             sum_y += p.y
         
-        return Point(sum_x / len(self.points), sum_y / len(self.points))
+        self.center_point = Point(sum_x / len(self.points), sum_y / len(self.points))
+
+    def print_points(self):
+        for p in self.points:
+            print("(" + str(p.x) + "," + str(p.y) + ")")
+        print("-------------------")
