@@ -1,5 +1,6 @@
 from Point import Point
 import math
+import time
 
 class Polygon:
     def __init__(self, points=[]):
@@ -48,16 +49,20 @@ class Polygon:
     
     def rotate_points_abt_center(self, radians):
         
-        for p in self.points:
-            x = p.x
-            y = p.y
+        #interpolate rotation
 
-            center_diff_x = x - self.center_point.x
-            center_diff_y = y - self.center_point.y
+        for r in range(10):
+            angle = (radians / (10 - r + 1))
+            for p in self.points:
+                x = p.x
+                y = p.y
 
-            p.x = center_diff_x*math.cos(radians) - center_diff_y*math.sin(radians) + self.center_point.x
-            p.y = center_diff_x*math.sin(radians) + center_diff_y*math.cos(radians) + self.center_point.y
-    
+                center_diff_x = x - self.center_point.x
+                center_diff_y = y - self.center_point.y
+
+                p.x = center_diff_x*math.cos(angle) - center_diff_y*math.sin(angle) + self.center_point.x
+                p.y = center_diff_x*math.sin(angle) + center_diff_y*math.cos(angle) + self.center_point.y
+            time.sleep(0.01)
 
     def calc_centroid(self):
         sum_x = 0
@@ -86,8 +91,7 @@ class Polygon:
 
     def calc_angle_of_rotation(self, x, y):
 
-        if self.rotation_point == None:
-            self.find_rotation_vertex()
+        self.find_rotation_vertex()
 
         centroid_to_rot = Point(self.rotation_point.x - self.center_point.x, self.rotation_point.y - self.center_point.y)
         centroid_to_mouse = Point( x - self.center_point.x, y - self.center_point.y)
