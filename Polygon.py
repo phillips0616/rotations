@@ -47,22 +47,32 @@ class Polygon:
             p.x = x*math.cos(radians) - y*math.sin(radians)
             p.y = x*math.sin(radians) + y*math.cos(radians)
     
-    def rotate_points_abt_center(self, radians):
-        
+    def rotate_points_abt_center(self, radians, direction):
+        angle = radians
         #interpolate rotation
 
-        for r in range(10):
-            angle = (radians / (10 - r + 1))
-            for p in self.points:
-                x = p.x
-                y = p.y
+        # for r in range(10):
+        #     angle = (radians / (10 - r + 1))
+        for p in self.points:
+            x = p.x
+            y = p.y
 
-                center_diff_x = x - self.center_point.x
-                center_diff_y = y - self.center_point.y
+            p.x , p.y = self.get_rotated_point_values(p, angle, direction)
+    
+    def get_rotated_point_values(self, p, radians, direction):
+        x = p.x
+        y = p.y
 
-                p.x = center_diff_x*math.cos(angle) - center_diff_y*math.sin(angle) + self.center_point.x
-                p.y = center_diff_x*math.sin(angle) + center_diff_y*math.cos(angle) + self.center_point.y
-            time.sleep(0.01)
+        center_diff_x = x - self.center_point.x
+        center_diff_y = y - self.center_point.y
+
+        if direction == "counter":
+            x = center_diff_x*math.cos(radians) - center_diff_y*math.sin(radians) + self.center_point.x
+            y = center_diff_x*math.sin(radians) + center_diff_y*math.cos(radians) + self.center_point.y
+        else:
+            x = center_diff_x*math.cos(radians) + center_diff_y*math.sin(radians) + self.center_point.x
+            y = -1*center_diff_x*math.sin(radians) + center_diff_y*math.cos(radians) + self.center_point.y 
+        return x, y
 
     def calc_centroid(self):
         sum_x = 0
@@ -74,10 +84,13 @@ class Polygon:
         self.center_point = Point(sum_x / len(self.points), sum_y / len(self.points))
 
     
-    def rotate_towards_mouse(self, x ,y):
+    def rotate_towards_mouse(self, x ,y, prev_x, prev_y):
         radians = self.calc_angle_of_rotation(x, y)
         print(radians)
-        self.rotate_points_abt_center(radians)
+        if y - prev_y > 0:
+            self.rotate_points_abt_center(radians, "counter")
+        else:
+            self.rotate_points_abt_center(radians, "clockwise")
 
     def print_points(self):
         for p in self.points:
@@ -91,16 +104,21 @@ class Polygon:
 
     def calc_angle_of_rotation(self, x, y):
 
-        self.find_rotation_vertex()
+        # self.find_rotation_vertex()
 
-        centroid_to_rot = Point(self.rotation_point.x - self.center_point.x, self.rotation_point.y - self.center_point.y)
-        centroid_to_mouse = Point( x - self.center_point.x, y - self.center_point.y)
+        # centroid_to_rot = Point(self.rotation_point.x - self.center_point.x, self.rotation_point.y - self.center_point.y)
+        # centroid_to_mouse = Point( x - self.center_point.x, y - self.center_point.y)
 
-        mag_centroid_to_rot = math.sqrt(centroid_to_rot.x ** 2 + centroid_to_rot.y **2)
-        mag_centroid_to_mouse = math.sqrt(centroid_to_mouse.x ** 2 + centroid_to_mouse.y **2)
+        # mag_centroid_to_rot = math.sqrt(centroid_to_rot.x ** 2 + centroid_to_rot.y **2)
+        # mag_centroid_to_mouse = math.sqrt(centroid_to_mouse.x ** 2 + centroid_to_mouse.y **2)
 
-        dot_over_mags = ((centroid_to_mouse.x * centroid_to_rot.x) + (centroid_to_mouse.y * centroid_to_rot.y)) / (mag_centroid_to_mouse * mag_centroid_to_rot)
+        # dot_over_mags = ((centroid_to_mouse.x * centroid_to_rot.x) + (centroid_to_mouse.y * centroid_to_rot.y)) / (mag_centroid_to_mouse * mag_centroid_to_rot)
 
-        angle = math.acos(dot_over_mags)
+        # angle = math.acos(dot_over_mags)
+
+        adj = abs(x - self.center_point.x)
+        hyp = math.sqrt(adj ** 2 + (self.center_point.y - y) ** 2)
+
+        angle = math.acos(adj / hyp)
 
         return angle

@@ -14,6 +14,8 @@ class Sketchpad(Canvas):
         self.bind("<Button-3>", self.complete_polygon)
         self.bind("<B1-Motion>", self.animate_rotation)
         self.rotation = False
+        self.prev_x_mouse_pos = None
+        self.prev_y_mouse_pos = None
 
     
     def translate_point(self, p):
@@ -32,7 +34,16 @@ class Sketchpad(Canvas):
         if self.rotation:
             point = self.translate_point(Point(event.x, event.y))
 
-            self.polygon.rotate_towards_mouse(point.x,point.y)
+            if self.prev_x_mouse_pos == None or self.prev_y_mouse_pos == None:
+                self.prev_x_mouse_pos = event.x
+                self.prev_y_mouse_pos = event.y
+            
+            prev_point = self.translate_point(Point(self.prev_x_mouse_pos, self.prev_y_mouse_pos))
+
+            self.polygon.rotate_towards_mouse(point.x,point.y, prev_point.x, prev_point.y)
+
+            self.prev_x_mouse_pos = event.x
+            self.prev_y_mouse_pos = event.y
 
             self.draw_polygon()
 
