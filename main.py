@@ -1,6 +1,7 @@
 from tkinter import *
 from Point import Point
 from Polygon import Polygon
+from Sketchpad import Sketchpad
 import time
 import random
 
@@ -62,31 +63,14 @@ def clear_lines():
     lines.clear()
 
 root = Tk()
-root.columnconfigure(0, weight=1)
-root.rowconfigure(0, weight=1)
+root.geometry("1000x1000")
+root.update_idletasks()
+
+sketchpad = Sketchpad(root, 500, 500)
+sketchpad.pack(expand=True, fill='both')
 
 canvas = Canvas(root, width=1000, height=1000)
-canvas.bind("<Button-1>", make_point)
-canvas.bind("<Button-3>", animate_rotation)
 canvas.grid(column=0, row=0, sticky=(N, W, E, S))
-
-origin_x = 500
-origin_y = 500
-
-
-# poly = Polygon([Point(-100,0), Point(100,0), Point(0,100)])
-poly = Polygon()
-# poly.add_point(Point(100,0))
-# poly.print_points()
-# poly.add_point(Point(-100,0))
-# poly.print_points()
-# poly.add_point(Point(0,100))
-# poly.print_points()
-# poly.calc_centroid()
-# draw_obj(poly)
-
-root.update_idletasks()
-root.update()
 
 # animate_rotation(poly, 360)
 
