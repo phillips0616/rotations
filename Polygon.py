@@ -85,7 +85,7 @@ class Polygon:
 
     
     def rotate_towards_mouse(self, x ,y, prev_x, prev_y):
-        radians = self.calc_angle_of_rotation(x, y)
+        radians = self.calc_angle_of_rotation(x, y, prev_x, prev_y)
         print(radians)
         if y - prev_y > 0:
             self.rotate_points_abt_center(radians, "counter")
@@ -97,28 +97,26 @@ class Polygon:
             print("(" + str(p.x) + "," + str(p.y) + ")")
         print("-------------------")
 
-    def find_rotation_vertex(self):
-        #I am calling the rotation vertex the midpoint between the first two points
-        self.rotation_point = Point((self.points[0].x + self.points[1].x)/2,(self.points[0].y + self.points[1].y)/2)
 
+    def calc_angle_of_rotation(self, x, y, prev_x, prev_y):
 
-    def calc_angle_of_rotation(self, x, y):
+       
 
-        # self.find_rotation_vertex()
+        centroid_to_prev = Point(prev_x - self.center_point.x, prev_y - self.center_point.y)
+        centroid_to_cur = Point( x - self.center_point.x, y - self.center_point.y)
 
-        # centroid_to_rot = Point(self.rotation_point.x - self.center_point.x, self.rotation_point.y - self.center_point.y)
-        # centroid_to_mouse = Point( x - self.center_point.x, y - self.center_point.y)
+        mag_centroid_to_rot = math.sqrt(centroid_to_prev.x ** 2 + centroid_to_prev.y **2)
+        mag_centroid_to_mouse = math.sqrt(centroid_to_cur.x ** 2 + centroid_to_cur.y **2)
 
-        # mag_centroid_to_rot = math.sqrt(centroid_to_rot.x ** 2 + centroid_to_rot.y **2)
-        # mag_centroid_to_mouse = math.sqrt(centroid_to_mouse.x ** 2 + centroid_to_mouse.y **2)
+        dot_over_mags = ((centroid_to_prev.x * centroid_to_cur.x) + (centroid_to_prev.y * centroid_to_cur.y)) / (mag_centroid_to_mouse * mag_centroid_to_rot)
 
-        # dot_over_mags = ((centroid_to_mouse.x * centroid_to_rot.x) + (centroid_to_mouse.y * centroid_to_rot.y)) / (mag_centroid_to_mouse * mag_centroid_to_rot)
+        #the weight allows it to rotate faster (less mouse dragging)
+        weight = 20
+        angle = math.acos(dot_over_mags)*weight
 
-        # angle = math.acos(dot_over_mags)
+        # adj = abs(x - self.center_point.x)
+        # hyp = math.sqrt(adj ** 2 + (self.center_point.y - y) ** 2)
 
-        adj = abs(x - self.center_point.x)
-        hyp = math.sqrt(adj ** 2 + (self.center_point.y - y) ** 2)
-
-        angle = math.acos(adj / hyp)
+        # angle = math.acos(adj / hyp)
 
         return angle
