@@ -1,69 +1,83 @@
 from tkinter import *
 from Polygon import Polygon
 from Point import Point
-from ColorPicker import ColorPicker
 import time
 
-class Sketchpad:
+class Sketchpad(Canvas):
     def __init__(self, parent, origin_x, origin_y):
-        super().init(parent, bg="white")
+        super().__init__(parent, bg="white")
         self.origin_x = origin_x
         self.origin_y = origin_y
-        self.polygons = {}
-        self.color_picker = ColorPicker()
+        self.polygon = Polygon()
+        self.canvas_objs = {"vertices": [], "lines": []}
         self.bind("<Button-1>", self.make_point)
-        self.bind("<Button-3>", self.animate_rotation)
+        self.bind("<Button-3>", self.complete_polygon)
+        self.bind("<B1-Motion>", self.animate_rotation)
+        self.rotation = False
 
     
     def translate_point(self, p):
         return Point(p.x + self.origin_x, self.origin_y - p.y)
-
-
-    def animate_rotation(self, polygon, event):
-        polygon.calc_centroid()
-        degrees = 360
-        for r in range(degrees):
-            #canvas.delete("all")
-            polygon.rotate_points_abt_center(1)
-            time.sleep(0.01)
-            draw_obj(polygon)
-
-    def make_point(self, polygon, event):
-        p = Point(event.x - origin_x, origin_y - event.y)
-        poly.add_point(p)
-        canvas.create_oval(event.x -5, event.y - 5, event.x + 5, event.y + 5, fill="black")
-        poly.print_points()
-        if len(poly.points) >= 3:
-            print("redrawing....")
-            draw_obj(poly)
     
-    def draw_polygon(self, polygon, should_remove_lines=True, should_random_colors=False):
-        if should_remove_lines:
-            self.remove_lines(polygon)
+    def complete_polygon(self, event):
 
-        for r in range(len(polygon.points) - 1):
-            
-            p1 = self.translate_point(polygon.points[r])
-            p2 = self.translate_point(polygon.points[r + 1])
+        self.polygon.calc_centroid()
 
-            color = "black"
-            if should_random_colors:
-                color = self.color_picker.get_random_color()
-                
-            line = self.create_line(p1.x,p1.y, p2.x, p2.y, fill=color)
-            self.polygons[polygon]
-            
+        self.unbind("<Button-1>")
         
-        color = colors[random.randint(0,len(colors) - 1)]
-        last = translate_point(polygon.points[-1])
-        first = translate_point(polygon.points[0])
-        line = canvas.create_line(last.x, last.y, first.x, first.y, fill=color)
-        lines.append(line)
-        root.update()
+        self.rotation = True
 
+
+    def animate_rotation(self, event):
+        if self.rotation:
+            point = self.translate_point(Point(event.x, event.y))
+
+            self.polygon.rotate_towards_mouse(point.x,point.y)
+
+            self.draw_polygon()
+
+    def make_point(self, event):
+        p = Point(event.x - self.origin_x, self.origin_y - event.y)
+        self.polygon.add_point(p)
+        vertex = self.create_oval(event.x -3, event.y - 3, event.x + 3, event.y + 3, fill="black")
+        self.canvas_objs["vertices"].append(vertex)
+        if len(self.polygon.points) >= 3:
+            print("redrawing....")
+            self.draw_polygon()
     
-    def remove_lines(self, polygon):
-        lines = self.polygons[polygon]
-        for line in lines:
-            self.delete(line)
-        lines.clear()
+    def draw_polygon(self):
+        self.clear_sketchpad()
+
+        for r in range(len(self.polygon.points) - 1):
+            
+            p1 = self.translate_point(self.polygon.points[r])
+            p2 = self.translate_point(self.polygon.points[r + 1])
+                
+            line = self.create_line(p1.x,p1.y, p2.x, p2.y)
+            self.canvas_objs["lines"].append(line)
+
+            vertex1 = self.create_oval(p1.x -3, p1.y - 3, p1.x + 3, p1.y + 3, fill="black")
+            self.canvas_objs["vertices"].append(vertex1)
+
+            vertex2 = self.create_oval(p1.x -3, p1.y - 3, p1.x + 3, p1.y + 3, fill="black")
+            self.canvas_objs["vertices"].append(vertex2)
+        
+        last = self.translate_point(self.polygon.points[-1])
+        first = self.translate_point(self.polygon.points[0])
+        line = self.create_line(last.x, last.y, first.x, first.y)
+
+        vertex1 = self.create_oval(last.x -3, last.y - 3, last.x + 3, last.y + 3, fill="black")
+        self.canvas_objs["vertices"].append(vertex1)
+
+        vertex2 = self.create_oval(first.x -3, first.y - 3, first.x + 3, first.y + 3, fill="black")
+        self.canvas_objs["vertices"].append(vertex2)
+
+        self.canvas_objs["lines"].append(line)
+    
+    def clear_sketchpad(self):
+        self.delete("all")
+
+        #self.bind("<Button-1>", self.make_point)
+
+        self.canvas_objs = {"vertices": [], "lines": []}
+
