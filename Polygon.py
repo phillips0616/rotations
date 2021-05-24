@@ -49,10 +49,7 @@ class Polygon:
     
     def rotate_points_abt_center(self, radians, direction):
         angle = radians
-        #interpolate rotation
-
-        # for r in range(10):
-        #     angle = (radians / (10 - r + 1))
+        
         for p in self.points:
             x = p.x
             y = p.y
@@ -100,8 +97,6 @@ class Polygon:
 
     def calc_angle_of_rotation(self, x, y, prev_x, prev_y):
 
-       
-
         centroid_to_prev = Point(prev_x - self.center_point.x, prev_y - self.center_point.y)
         centroid_to_cur = Point( x - self.center_point.x, y - self.center_point.y)
 
@@ -114,9 +109,10 @@ class Polygon:
         weight = 20
         angle = math.acos(dot_over_mags)*weight
 
-        # adj = abs(x - self.center_point.x)
-        # hyp = math.sqrt(adj ** 2 + (self.center_point.y - y) ** 2)
-
-        # angle = math.acos(adj / hyp)
-
-        return angle
+        #prevent the angle from jumping when there is a large difference between previous and 
+        #current mouse position. 
+        rad_10_degrees = 0.174533
+        if angle > rad_10_degrees:
+            return rad_10_degrees
+        else:
+            return angle
