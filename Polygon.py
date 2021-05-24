@@ -49,7 +49,7 @@ class Polygon:
     
     def rotate_points_abt_center(self, radians, direction):
         angle = radians
-        
+
         for p in self.points:
             x = p.x
             y = p.y
@@ -84,10 +84,10 @@ class Polygon:
     def rotate_towards_mouse(self, x ,y, prev_x, prev_y):
         radians = self.calc_angle_of_rotation(x, y, prev_x, prev_y)
         print(radians)
-        if y - prev_y > 0:
-            self.rotate_points_abt_center(radians, "counter")
-        else:
+        if self.clockwise(Point(x,y), Point(prev_x, prev_y)):
             self.rotate_points_abt_center(radians, "clockwise")
+        else:
+            self.rotate_points_abt_center(radians, "counter")
 
     def print_points(self):
         for p in self.points:
@@ -113,6 +113,6 @@ class Polygon:
         #current mouse position. 
         rad_10_degrees = 0.174533
         if angle > rad_10_degrees:
-            return rad_10_degrees
+            return 0.0001 #rotate a tiny amount
         else:
             return angle
